@@ -1,6 +1,5 @@
-from typing import List, Tuple
-from Common.enums import TownStatus
-from simulation.GridCell import GridCell
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 class Grid:
     def __init__(self, width, height, torus=True):
@@ -24,6 +23,7 @@ class Grid:
         if agent.pos in self.cells:
             if agent in self.cells[agent.pos]:
                 self.cells[agent.pos].remove(agent)
+        agent.pos = None
 
     def normalize(self, pos):
         x, y = pos
@@ -55,3 +55,48 @@ class Grid:
 
     def get_cell_contents(self, pos):
         return self.cells.get(pos, [])
+
+    def run_gui(self, model):
+        fig, ax = plt.subplots(figsize=(8, 8))
+        fig.canvas.manager.set_window_title("Standalone Tornado Hunters MAS")
+
+        def update(frame):
+            if not model.running:
+                ani.event_source.stop()
+                return
+            model.step()
+            ax.clear()
+
+            ax.set_xlim(-0.5, self.width - 0.5)
+            ax.set_ylim(-0.5, self.height - 0.5)
+            ax.set_xticks(range(self.width))
+            ax.set_yticks(range(self.height))
+            ax.grid(color="gray", linestyle="--", linewidth=0.5, alpha=0.5)
+            ax.set_title(f"Tornado Hunters | Step: {model.steps} | Documented: {model.tornadoes_documented}/{model.total_tornadoes}")
+
+            for agent in model.agents:
+                if agent.pos is None:
+                    continue
+                x, y = agent.pos
+                
+                agent_type = type(agent).__name__
+
+                if agent_type == "TornadoAgent":
+                    is_sighted = agent.unique_id in model.hq.threatMap
+                    if getattr(agent, 'documented', False):
+                        t_color = "darkred" 
+                    elif is_sighted:
+                        t_color = "orange"  
+                    else:
+                        t_color = "red"     
+                    ax.plot(x, y, marker="X", color=t_color, markersize=14, linestyle="None", zorder=4)
+                elif agent_type == "ChaserAgent":
+                    ax.plot(x, y, marker="o", color="blue", markersize=10, linestyle="None", zorder=3)
+                elif agent_type == "TownAgent":
+                    color = "black" if getattr(agent, 'impacted', False) else "gold" if getattr(agent, 'evacuated', False) else "green"
+                    ax.plot(x, y, marker="s", color=color, markersize=18, linestyle="None", zorder=2)
+                elif agent_type == "HQAgent":
+                    ax.plot(x, y, marker="*", color="purple", markersize=22, linestyle="None", zorder=5)
+
+        ani = animation.FuncAnimation(fig, update, interval=500, repeat=False, cache_frame_data=False)
+        plt.show()

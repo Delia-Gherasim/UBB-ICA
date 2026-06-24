@@ -1,71 +1,368 @@
-# ui-review-extension README
+# UI/UX Review Extension for Visual Studio Code
 
-This is the README for your extension "ui-review-extension". After writing up a brief description, we recommend including the following sections.
+## Project Overview
 
-## Features
+**UI Review Extension** is a Visual Studio Code extension developed to analyze frontend projects and provide automated UI/UX quality feedback directly inside the editor.
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+The extension scans source files and applies rule-based static analysis to detect common design, accessibility, responsiveness, and maintainability problems.
 
-For example if there is an image subfolder under your extension project workspace:
+The goal is to help developers improve frontend quality early in development by identifying issues before manual testing.
 
-\!\[feature X\]\(images/feature-x.png\)
+This project was developed as a **framework extension project** using the **Visual Studio Code Extension API**.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+# Objectives
 
-## Requirements
+The project aims to:
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- Extend Visual Studio Code with custom functionality
+- Perform static UI/UX analysis
+- Detect frontend anti-patterns
+- Improve accessibility compliance
+- Encourage responsive design
+- Generate design quality metrics
+- Present results inside a dashboard
 
-## Extension Settings
+# Technologies Used
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+## Languages
 
-For example:
+- TypeScript
+- HTML
+- CSS
 
-This extension contributes the following settings:
+## Frameworks / APIs
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+- Visual Studio Code Extension API
+- Node.js
+- Webview API
 
-## Known Issues
+## Development Tools
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+- Visual Studio Code
+- npm
+- TypeScript Compiler
+- ESBuild
 
-## Release Notes
+# Functional Requirements
 
-Users appreciate release notes as you update your extension.
+1. Scan frontend project files
+2. Analyze source code
+3. Detect UI/UX issues
+4. Generate quality scores
+5. Display a dashboard
+6. Present diagnostics and recommendations
 
-### 1.0.0
+# Supported File Types
 
-Initial release of ...
+- `.html`
+- `.css`
+- `.js`
+- `.jsx`
+- `.ts`
+- `.tsx`
 
-### 1.0.1
+# System Architecture
 
-Fixed issue #.
+```
+Frontend Workspace
+        ↓
+Workspace Scanner
+        ↓
+Analysis Engine
+        ↓
+Rule System
+        ↓
+Issue Collection
+        ↓
+Score Engine
+        ↓
+Dashboard UI
+```
 
-### 1.1.0
+# Component Architecture
 
-Added features X, Y, and Z.
+## 1. WorkspaceScanner
 
----
+### Responsibility
 
-## Following extension guidelines
+Searches project files and collects frontend resources.
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+### Input
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+Workspace directory
 
-## Working with Markdown
+### Output
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+List of source files
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+Methods:
 
-## For more information
+```
+getFrontendFiles()
+```
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+## 2. AnalysisEngine
 
-**Enjoy!**
+### Responsibility
+
+Executes analysis rules.
+
+### Input
+
+- File content
+- File path
+
+### Output
+
+- Issue collection
+
+Methods:
+
+```
+run()
+```
+
+## 3. Rule Engine
+
+### Responsibility
+
+Executes UI/UX validation rules.
+
+Implemented interface:
+
+```
+Rule
+```
+
+Methods:
+
+```
+analyze()
+```
+
+## 4. ScoreEngine
+
+### Responsibility
+
+Calculates project quality metrics.
+
+Generated scores:
+
+- Overall Score
+- Accessibility Score
+- Design Score
+- Complexity Score
+
+## 5. UiPanel
+
+### Responsibility
+
+Displays analysis results.
+
+Displayed information:
+
+- Metrics
+- Issues
+- Categories
+- Severity
+
+# Implemented Rules
+
+## Accessibility Rules
+
+### Missing Alt Text
+
+Detects:
+
+```html
+<img src="photo.jpg" />
+```
+
+### Small Touch Targets
+
+Detects:
+
+```css
+height: 20px;
+```
+
+## Design Rules
+
+### Hardcoded Colors
+
+Detects:
+
+```css
+color: #ff0000;
+```
+
+### Tiny Font Sizes
+
+Detects:
+
+```css
+font-size: 10px;
+```
+
+### Inconsistent Spacing
+
+Detects irregular spacing values.
+
+## Responsive Rules
+
+### Fixed Width Detection
+
+Detects:
+
+```css
+width: 1200px;
+```
+
+## Complexity Rules
+
+### Deep Nesting Detection
+
+Detects excessive nesting.
+
+## Inline Style Rules
+
+Detects:
+
+```jsx
+style={{}}
+```
+
+# Scoring Algorithm
+
+Issue severity impacts score.
+
+| Severity | Penalty |
+| -------- | ------- |
+| High     | −5      |
+| Medium   | −2      |
+| Low      | −1      |
+
+Final scores:
+
+```
+Overall Score
+Accessibility Score
+Design Score
+Complexity Score
+```
+
+Range:
+
+```
+0–100
+```
+
+# User Workflow
+
+## Run Analysis
+
+Open:
+
+```
+Ctrl + Shift + P
+```
+
+Execute:
+
+```
+UI Review: Analyze
+```
+
+## Dashboard Output
+
+Displayed information:
+
+- Overall score
+- Accessibility score
+- Design score
+- Simplicity score
+- Detected issues
+
+# Project Structure
+
+```
+src/
+
+analysis/
+ ├── rules/
+ ├── analysisEngine.ts
+
+models/
+ └── Issue.ts
+
+scanner/
+ └── workspaceScanner.ts
+
+scoring/
+ └── ScoreEngine.ts
+
+ui/
+ └── uiPanel.ts
+
+extension.ts
+```
+
+# Installation
+
+Clone repository:
+
+```bash
+git clone <repository-url>
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Compile:
+
+```bash
+npm run compile
+```
+
+Run:
+
+```
+F5
+```
+
+# Testing
+
+Test procedure:
+
+1. Open Extension Development Host
+2. Open a frontend project
+3. Execute analysis
+4. Validate results
+
+# Limitations
+
+Current limitations:
+
+- Rule-based analysis only
+- No automatic fixes
+- No runtime UI testing
+- Limited semantic understanding
+
+# Future Improvements
+
+Planned features:
+
+- VS Code Diagnostics integration
+- Squiggly warnings
+- Hover explanations
+- Auto-fix suggestions
+- Export reports (PDF/JSON)
+
+# Conclusion
+
+UI Review Extension demonstrates how a development framework can be extended through modular architecture to provide automated UI/UX quality analysis directly inside Visual Studio Code.
+
+The project combines static analysis, accessibility validation, scoring mechanisms, and visual reporting to improve frontend development workflows.

@@ -29,7 +29,7 @@ export class DesignConsistencyRule implements Rule {
         issues.push({
           file: filePath,
           severity: "high",
-          message: "Font size too small (< 12px is hard to read).",
+          message: "Font size too small.",
           line: i + 1,
           category: "design",
         });
@@ -39,7 +39,7 @@ export class DesignConsistencyRule implements Rule {
         issues.push({
           file: filePath,
           severity: "low",
-          message: "Non-standard spacing detected. Stick to a 4px or 8px grid.",
+          message: "Non-standard spacing detected.",
           line: i + 1,
           category: "design",
         });

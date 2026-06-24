@@ -16,7 +16,7 @@ export class AccessibilityRule implements Rule {
         issues.push({
           file: filePath,
           severity: "high",
-          message: "Image missing descriptive alt text (a11y).",
+          message: "Image missing alt text.",
           line: i + 1,
           category: "accessibility",
         });
@@ -29,7 +29,7 @@ export class AccessibilityRule implements Rule {
         issues.push({
           file: filePath,
           severity: "medium",
-          message: "Touch target might be too small (< 44px recommended).",
+          message: "Touch target might be too small.",
           line: i + 1,
           category: "accessibility",
         });

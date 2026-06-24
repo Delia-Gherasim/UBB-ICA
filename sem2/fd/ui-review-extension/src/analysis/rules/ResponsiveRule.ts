@@ -13,8 +13,7 @@ export class ResponsiveRule implements Rule {
         issues.push({
           file: filePath,
           severity: "medium",
-          message:
-            "Fixed large width detected. Consider using %, vw, or max-width.",
+          message: "Fixed large width detected.",
           line: i + 1,
           category: "responsive",
         });

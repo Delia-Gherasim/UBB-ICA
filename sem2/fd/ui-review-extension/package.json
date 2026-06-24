@@ -3,7 +3,7 @@
   "displayName": "ui-review-extension",
   "description": "Frontend UI UX Analyzer",
   "version": "0.0.1",
-  "icon": "resources/icon.png",
+  "icon": "src\\resources\\icon.png",
   "engines": {
     "vscode": "^1.125.0"
   },
@@ -27,7 +27,7 @@
         {
           "id": "uiReview",
           "title": "UI Review",
-          "icon": "resources/icon.png"
+          "icon": "src\\resources\\icon.png"
         }
       ]
     },

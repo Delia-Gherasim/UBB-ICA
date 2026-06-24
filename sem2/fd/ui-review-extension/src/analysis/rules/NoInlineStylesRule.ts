@@ -13,8 +13,7 @@ export class NoInlineStylesRule implements Rule {
         issues.push({
           file: filePath,
           severity: "medium",
-          message:
-            "Inline styles detected. Consider using CSS classes instead.",
+          message: "Inline styles detected.",
           line: i + 1,
           category: "design",
         });

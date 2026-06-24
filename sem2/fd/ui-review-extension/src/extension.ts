@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { WorkspaceScanner } from "./scanner/workspaceScanner";
 import { AnalysisEngine } from "./analysis/analysisEngine";
 import { UiPanel } from "./ui/uiPanel";
+
 import { NoInlineStylesRule } from "./analysis/rules/NoInlineStylesRule";
 import { AccessibilityRule } from "./analysis/rules/AccessibilityRule";
 import { DesignConsistencyRule } from "./analysis/rules/DesignConsistencyRule";
@@ -19,15 +20,19 @@ export function activate(context: vscode.ExtensionContext) {
     new ComplexityRule(),
   ]);
 
-  const panelProvider = new UiPanel();
+  const panelProvider = new UiPanel(context.extensionUri);
 
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider("uiReviewPanel", panelProvider),
   );
 
-  const command = vscode.commands.registerCommand(
-    "ui-review.analyze",
-    async () => {
+  let isRunning = false;
+
+  const runAnalysis = async () => {
+    if (isRunning) return;
+    isRunning = true;
+
+    try {
       const files = await scanner.getFrontendFiles();
       let allIssues: any[] = [];
 
@@ -39,16 +44,52 @@ export function activate(context: vscode.ExtensionContext) {
         allIssues.push(...issues);
       }
 
-      await vscode.commands.executeCommand("uiReviewPanel.focus");
       panelProvider.update(allIssues);
 
       vscode.window.showInformationMessage(
         `UI/UX Scan complete: Found ${allIssues.length} issues`,
       );
-    },
+    } finally {
+      isRunning = false;
+    }
+  };
+
+  const command = vscode.commands.registerCommand(
+    "ui-review.analyze",
+    runAnalysis,
   );
 
   context.subscriptions.push(command);
+
+  const watcher = vscode.workspace.createFileSystemWatcher(
+    "**/*.{js,jsx,ts,tsx,html,css}",
+  );
+
+  let timeout: NodeJS.Timeout | undefined;
+
+  const triggerAnalysis = () => {
+    if (timeout) clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+      vscode.commands.executeCommand("ui-review.analyze");
+    }, 1000);
+  };
+
+  watcher.onDidChange(triggerAnalysis);
+  watcher.onDidCreate(triggerAnalysis);
+  watcher.onDidDelete(triggerAnalysis);
+
+  context.subscriptions.push(watcher);
+
+  setTimeout(() => {
+    vscode.commands.executeCommand("ui-review.analyze");
+  }, 1500);
+
+  if (vscode.workspace.workspaceFolders) {
+    vscode.commands.executeCommand("ui-review.analyze");
+  }
+
+  context.subscriptions.push(watcher);
 }
 
 export function deactivate() {}

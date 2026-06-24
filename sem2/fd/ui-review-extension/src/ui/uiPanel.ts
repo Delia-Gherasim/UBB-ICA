@@ -45,7 +45,7 @@ export class UiPanel implements vscode.WebviewViewProvider {
   }
 
   private render() {
-    if (!this.view) return;
+    if (!this.view) {return;}
 
     const issues = this.currentIssues;
     const scores = ScoreEngine.calculateScores(issues);

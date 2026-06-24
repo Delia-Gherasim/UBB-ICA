@@ -29,7 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
   let isRunning = false;
 
   const runAnalysis = async () => {
-    if (isRunning) return;
+    if (isRunning) {return;}
     isRunning = true;
 
     try {
@@ -68,7 +68,7 @@ export function activate(context: vscode.ExtensionContext) {
   let timeout: NodeJS.Timeout | undefined;
 
   const triggerAnalysis = () => {
-    if (timeout) clearTimeout(timeout);
+    if (timeout) {clearTimeout(timeout);}
 
     timeout = setTimeout(() => {
       vscode.commands.executeCommand("ui-review.analyze");
